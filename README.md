@@ -9,7 +9,7 @@
 | [Summary statistics](summary_statistics/README.md) | Summary statistics version DDMM and AD analysis runner |
 
 ```sh
-git clone --depth 1 https://github.com/984143652yxr-sudo/DDMM.git
+git clone --depth 1 https://github.com/catherineyu-stat/DDMM.git
 cd DDMM
 ```
 
