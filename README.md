@@ -4,7 +4,7 @@
 |---|---|
 | [Spectral filters](R/README.md) | PCA, TRIM, LMM and a short DDMM example |
 | [DDMM group](DDMM%20group/README.md) | Group tests with real 1000G genotypes and simulated phenotypes |
-| [Filter comparison](filter_comparison/README.md) | Admixture and family simulations |
+| [Filter comparison](filter_comparison/README.md) | Original local admixture and family simulation scripts |
 | [Semi-synthetic 1000G](semi-synthetic-1000G/README.md) | Pooled ancestry samples, simulation and summaries |
 | [Summary statistics](summary_statistics/README.md) | Summary statistics version DDMM and AD analysis runner |
 
