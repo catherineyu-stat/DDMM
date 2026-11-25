@@ -1,43 +1,12 @@
-## ============================================================================
-## Section 5.1 — Admixture PCA-O / PCA-E comparison driver
-##
-## Compares, on simulated admixed data, six pipelines that share the same
-## raw genotype + phenotype:
-##
-##   * ggmix       : penalised LMM (kinship-aware, no spectral pre-filter)
-##   * plmmr       : another penalised LMM
-##   * PCA-E       : PCA-Lasso, where Q is the projection off the top-k
-##                   left singular vectors of an *external* marker set X_GRM
-##   * DDMM-E      : debiased DDMM with the same Q (= PCA-E filter)
-##   * PCA-O       : PCA-Lasso, where Q comes from the test SNPs themselves
-##                   (no external markers)
-##   * DDMM-O      : debiased DDMM with the PCA-O filter
-##   * DDMM-Trim   : DDMM with the TRIM filter (high-rank baseline)
-##
-## All six DDMM variants now share a single API:
-##
-##     Q     <- build_filter("decorrelation", X = ..., q = 5)
-##     stat  <- test_stat_decorrelation_short(Y, X, transform_matrix = Q)
-##     out   <- run_ddmm_variant("DDMM-X", stat,
-##                               list(transform_matrix = Q, centralize = TRUE))
-##
-## which lives in `inference_short_refactored.R`. The trace-Lasso machinery
-## from the old `solve_trace_lasso_flexible` is gone; PCA-Lasso is now
-## simply Lasso applied to (Q Y, Q X), implemented in `pca_lasso()` inside
-## `utils_extend.R`. This makes "PCA-Lasso vs DDMM" a clean head-to-head
-## using literally the same filter.
-##
-## Run as:    Rscript compare_new_extend.R <state>
-## ============================================================================
+# Admixture simulation with per-SNP BIC nodewise inference.
+# Run: Rscript compare_new_extend.R <state>
 
 Args  <- commandArgs(trailingOnly = TRUE)
 state <- as.integer(Args[1])
 if (is.na(state)) state <- 0L
 
 source("utils_extend.R")
-## refactored DDMM core: provides build_filter, test_stat_decorrelation_short,
-## run_ddmm_variant, post_estimation, multiple_testing
-source("inference_short_refactored.R")
+source("../inference.R")
 
 set.seed(2026 + state)
 
@@ -214,7 +183,7 @@ run_one_p <- function(p_input, state) {
   cat("\n--- Final Performance Comparison (p =", p_input, ") ---\n")
   print(results_df, digits = 4)
 
-  out_dir <- file.path(".", "results",
+  out_dir <- file.path(".", "results_bic",
                        paste0("result-state", state))
   dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
   write.csv(results_df,

@@ -1,19 +1,5 @@
-## ============================================================================
-## Section 5.1 helpers: admixture / PCA-O vs PCA-E comparison
-##
-## Slim version of the previous utils. We dropped the trace-Lasso machinery
-## (`solve_single_a`, `tune_a_trace_lasso`, `solve_trace_lasso_flexible`),
-## the bespoke `inference_new` / `nodewise_lasso` / `post_estimation_F`, and
-## the legacy `run_sun_variant`. Their roles are now taken by the
-## refactored core in `inference_short_refactored.R`:
-##
-##   * spectral filter Q              -> build_filter()
-##   * PCA-Lasso with filter Q        -> pca_lasso() (defined here)
-##   * debiased inference + post-est  -> test_stat_decorrelation_short()
-##                                       + run_ddmm_variant()
-##
-## Only metric helpers stay local.
-## ============================================================================
+# Admixture generation, PCA-Lasso, and performance metrics.
+# Shared DDMM inference is in ../inference.R.
 
 tryCatch({
   source("ggmix_utils.R")

@@ -18,18 +18,6 @@ if (length(missing_packages) > 0L) {
   stop("Please install ", paste(missing_packages, collapse = ", "), ".")
 }
 
-choose_results_directory <- function(local_directory, original_directory) {
-  local_files <- list.files(
-    local_directory,
-    pattern = "-results[.]csv$",
-    recursive = TRUE,
-    full.names = TRUE
-  )
-  if (length(local_files) > 0L) return(local_directory)
-  if (dir.exists(original_directory)) return(original_directory)
-  stop("No result-state files were found under ", local_directory)
-}
-
 read_results <- function(results_directory, scenario_name) {
   result_files <- list.files(
     results_directory,
@@ -56,14 +44,8 @@ read_results <- function(results_directory, scenario_name) {
   }))
 }
 
-admixture_directory <- choose_results_directory(
-  file.path(script_dir, "admixture", "results"),
-  file.path(script_dir, "..", "Admixture_PCA_OE", "plmmr_extend_model")
-)
-family_directory <- choose_results_directory(
-  file.path(script_dir, "family", "results"),
-  file.path(script_dir, "..", "family_structure", "family_results")
-)
+admixture_directory <- file.path(script_dir, "admixture", "results_bic")
+family_directory <- file.path(script_dir, "family", "results_bic")
 
 results <- dplyr::bind_rows(
   read_results(admixture_directory, "Low-rank admixture"),

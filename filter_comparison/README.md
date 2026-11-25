@@ -1,7 +1,7 @@
 # Filter comparison
 
-Scripts copied unchanged from `code_official/synthetic data/admixture` and
-`family`, with their original DDMM cores. These replace the earlier adapted runners.
+Admixture and family simulations share `inference.R`: DDMM with a separate
+BIC-selected nodewise penalty for each SNP.
 
 ## Install
 
@@ -25,10 +25,10 @@ Rscript plot_figure2.R
 Generate the family panels once. Repeat the association commands with state
 numbers `1` through `50`; their seed is `2026 + state`.
 
-**Output:** `<experiment>/results/result-state<state>/<p>-results.csv`;
+**Output:** `<experiment>/results_bic/result-state<state>/<p>-results.csv`;
 PDF/PNG/TIFF figures in `figure/`. Each CSV reports FDR, power, MSPE, and L1 error.
 
-## Settings in the local scripts
+## Parameters
 
 | Setting | Admixture | Family |
 |---|---|---|
@@ -49,22 +49,5 @@ second panel, exactly as in the local source.
 
 Admixture compares ggmix, plmmr, PCA-Lasso-O/E, DDMM-PCA-O/E, and DDMM-Trim.
 Family compares LMM-BH, ggmix, plmmr, LMM-Lasso, DDMM-LMM, DDMM-PCA, and DDMM-Trim.
-`LMM-Lasso` is Lasso on the LMM-filtered data. DDMM uses the original
-`multiple_testing()` threshold rule and post-selection estimation.
-
-## Local fixed-core variant
-
-The supplied `*_fixed.R` drivers retain the same simulation settings and use
-`inference_short_fixed.R`, which selects the nodewise penalty separately for
-each SNP by BIC. Outputs go to `results_fixed/`.
-
-```sh
-(cd admixture && RUN_ORIGINAL=1 Rscript compare_new_extend_fixed.R 1)
-(cd family && RUN_ORIGINAL=1 Rscript compare_family_extend_fixed.R 1)
-python3 plot_fix_comparison.py
-```
-
-`RUN_ORIGINAL=1` also evaluates the original core on the same data. The paired
-plot requires Python packages `numpy`, `pandas`, and `matplotlib` and writes to
-`figure_fixed/`. Change settings in the corresponding `*_fixed.R` driver when
-using this variant.
+`LMM-Lasso` is Lasso on the LMM-filtered data. DDMM uses `multiple_testing()` for thresholding and then post-selection estimation.
+Set its FDR level in `inference.R` (`run_ddmm_variant`, `alpha = 0.1`).

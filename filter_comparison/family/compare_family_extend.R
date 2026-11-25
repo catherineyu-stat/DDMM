@@ -1,55 +1,17 @@
-## ============================================================================
-## Section 5.2 — Family-data PCA / DDMM comparison driver
-##
-## Sister script to `compare_new_extend.R` in the Admixture folder. The two
-## files share the same orchestration, the same per-method block layout,
-## the same global-env handoff to `run_ddmm_variant()`, and the same
-## per-(state, p) CSV output convention. The only differences are
-##
-##   (a) the data source -- BED genotype files via `gaston`, instead of
-##       `gen_ddmm_data()` simulated genotypes;
-##   (b) two extra methods that only make sense with real / synthetic-real
-##       genotype data: BH (gaston's marginal LMM score test) and LMM
-##       (cv.glmnet on the LMM-whitened design);
-##   (c) MSPE and L1 are now reported for BH as well, via a post-selection
-##       OLS on the discovered SNPs inside the same LMM whitening geometry.
-##
-## Methods compared (one CSV row each, per (state, p)):
-##
-##   * BH        : marginal LMM-score test + Benjamini-Hochberg
-##   * ggmix     : penalised LMM with HDBIC
-##   * plmmr     : preconditioned Lasso with 5-fold CV
-##   * DDMM-Trim : DDMM with the TRIM spectral filter
-##   * LMM       : Lasso applied to the LMM-whitened design (no debiasing)
-##   * DDMM-LMM  : DDMM with the LMM whitening filter
-##   * DDMM-PCA  : DDMM with the PCA-projection filter (q = 10)
-##
-## All four DDMM variants and PCA-Lasso share the same single API
-##
-##     Q     <- build_filter(method, ...)
-##     stat  <- test_stat_decorrelation_short(Y, X, transform_matrix = Q)
-##     out   <- run_ddmm_variant("DDMM-X", stat,
-##                               list(transform_matrix = Q, centralize = TRUE))
-##
-## which lives in `inference_short_refactored.R`.
-##
-## Run as:    Rscript compare_family_extend.R <state>
-## ============================================================================
+# Family simulation with per-SNP BIC nodewise inference.
+# Run: Rscript compare_family_extend.R <state>
 
 if (!require(pacman)) install.packages("pacman")
 pacman::p_load(
-  ggmix, plmmr, dplyr, RSpectra, devtools, gaston, glmnet
+  ggmix, plmmr, dplyr, RSpectra, gaston, glmnet
 )
 
 Args  <- commandArgs(trailingOnly = TRUE)
 state <- as.integer(Args[1])
 if (is.na(state)) state <- 0L
 
-## ---- helpers + refactored DDMM core --------------------------------------
 source("helper.R")                                   # calculate_l1_error / fdr_power
-source("inference_short_refactored.R")
-## NB: sourcing the refactored core *after* helper.R intentionally overrides
-## helper.R's legacy `run_sun_variant` with the new `run_ddmm_variant` alias.
+source("../inference.R")
 
 ## run_ddmm_variant() expects calculate_mspe() in scope; define a local one
 ## so the family driver doesn't depend on utils_extend.R.
@@ -319,7 +281,7 @@ run_one_p <- function(p_target, state) {
   cat(sprintf("\n--- Final Performance Comparison (p = %d) ---\n", p_target))
   print(results_df, digits = 4)
 
-  out_dir <- file.path(".", "results",
+  out_dir <- file.path(".", "results_bic",
                        paste0("result-state", state))
   dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
   write.csv(results_df,

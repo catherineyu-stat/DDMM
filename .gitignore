@@ -37,3 +37,5 @@ filter_comparison/**/slurm_output/
 filter_comparison/figure/
 filter_comparison/figure_fixed/
 filter_comparison/**/Rplots.pdf
+
+filter_comparison/**/results_bic/
